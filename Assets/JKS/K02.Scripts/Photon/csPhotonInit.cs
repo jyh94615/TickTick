@@ -168,6 +168,9 @@ using UnityEngine.SceneManagement;
  * - PhotonViewID
  */
 
+using SimpleJSON;
+using TeamInterface;
+
 public class csPhotonInit : MonoBehaviour { //#6-1 팀플 포톤 //#19-2 (UI버전에서 사용) 주석 추가 - 동적 생성한 방 띄우기 & 입장하기까지
 
     //App의 버전 정보 (번들 버전과 일치 시키자...)
@@ -208,10 +211,11 @@ public class csPhotonInit : MonoBehaviour { //#6-1 팀플 포톤 //#19-2 (UI버�
 // ==================================
     //플레어의 생성 위치 저장 레퍼런스
     public Transform playerPos;
-
+    PlayerInfo playerInfo;
     //App 인증 및 로비연결
     void Awake()
     {
+        playerInfo = new PlayerInfo();
         /*
          * 포톤 클라우드
          * 
@@ -258,9 +262,25 @@ public class csPhotonInit : MonoBehaviour { //#6-1 팀플 포톤 //#19-2 (UI버�
          scrollContents.GetComponent<RectTransform>().pivot = new Vector2(0.0f, 1.0f);  //# 피봇 동적 조작 가능
     }
 
-    void Start()
+    IEnumerator Start()
     {
         roomName.onValueChanged.AddListener(OnInputRoomNameChange);
+
+        TextAsset jsonData = Resources.Load<TextAsset>("player_info");
+        string StrJsonData = jsonData.text;                             //# 데이터를 문자열로 가져와서
+        var json = JSON.Parse(StrJsonData); //배열 형태로 자동 파싱         //# SimpleJSON을 통해 객체로 생성
+                                            //플레이어 정보 파싱
+
+        playerInfo.playerName = json["플레이어 이름"].ToString();
+        playerInfo.islandName = json["섬 이름"].ToString();
+
+        playerInfo.clothesNum = json["옷 종류"].AsInt;
+
+        string hex = json["옷 색"].Value;
+        //Color32 color = HexToColor32(hex);
+        playerInfo.SetHexToColor32(hex);
+
+        yield return null;
     }
 
     void OnInputRoomNameChange(string _input)
@@ -349,9 +369,11 @@ public class csPhotonInit : MonoBehaviour { //#6-1 팀플 포톤 //#19-2 (UI버�
     //로컬에 저장된 플레이어 이름을 반환하거나 랜덤 생성하는 함수 (UI 버전에서 사용)
     string GetUserId()  // 이건 원래 있던 함수이고, 안에 내용을 JSON으로 가져오도록 하는 부분만 내가 수정한 것
     {
+        
+
         //(참고) 구글플레이 연동시 구글 아이디로 유저 아이디 가져오자.
         // string userId = InfoManager.Info.playerName;    //PlayerPrefs.GetString("USER_ID");
-        string userId = InfoManager.Ins.playerName;    //PlayerPrefs.GetString("USER_ID"); //#11-6
+        string userId = playerInfo.playerName;    //PlayerPrefs.GetString("USER_ID"); //#11-6
         Debug.Log("아이디 확인1 : " + userId );
 
         //유저 아이디가 NULL일 경우 랜덤 아이디 생성 

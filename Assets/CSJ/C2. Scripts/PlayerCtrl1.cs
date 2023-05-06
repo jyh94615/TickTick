@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SimpleJSON;
 using TeamInterface;
 using UnityEngine.UI;
 
@@ -145,6 +146,8 @@ public class PlayerCtrl1 : MonoBehaviour, IObjectStatus, IPhotonBase, IPhotonInT
     public bool playWalkSound = false;
     bool playWalkSoundDelay=false;
 
+    //##
+    private PlayerInfo playerInfo;
 
     public void SetOulusMode(bool tmpCheck)
     {
@@ -171,8 +174,9 @@ public class PlayerCtrl1 : MonoBehaviour, IObjectStatus, IPhotonBase, IPhotonInT
         pv.ObservedComponents[0] = this;
         pv.synchronization = ViewSynchronization.UnreliableOnChange;
 
+        playerInfo = new PlayerInfo();
 
-        if(pv.isMine) // PhotonNetwork.isMasterClient 마스터 클라이언트는 이런식 체크
+        if (pv.isMine) // PhotonNetwork.isMasterClient 마스터 클라이언트는 이런식 체크
         {
             GameObject[] tmpObj = GameObject.FindGameObjectsWithTag("PhotonGameManager");
 
@@ -188,6 +192,7 @@ public class PlayerCtrl1 : MonoBehaviour, IObjectStatus, IPhotonBase, IPhotonInT
             }
 
             m_grid2D.myPlyerCtrl = this;
+
 
             //메인 카메라에 추가된 SmoothFollowCam 스크립트(컴포넌트)에 추적 대상을 연결 
             //Camera.main.GetComponent<SmoothFollowCam>().target = camPivot;
@@ -248,13 +253,30 @@ public class PlayerCtrl1 : MonoBehaviour, IObjectStatus, IPhotonBase, IPhotonInT
         //         // isLoadCustom=true;
 
         //플레이어 얼굴 커스터마이징 추가
-        faceindex = InfoManager.Ins.clothesNum; //얼굴 초기화
+        TextAsset jsonData = Resources.Load<TextAsset>("player_info");
+        string StrJsonData = jsonData.text;                             //# 데이터를 문자열로 가져와서
+        var json = JSON.Parse(StrJsonData); //배열 형태로 자동 파싱         //# SimpleJSON을 통해 객체로 생성
+                                            //플레이어 정보 파싱
+
+        playerInfo.playerName = json["플레이어 이름"].ToString();
+        playerInfo.islandName = json["섬 이름"].ToString();
+
+        playerInfo.clothesNum = json["옷 종류"].AsInt;
+
+        string hex = json["옷 색"].Value;
+        //Color32 color = HexToColor32(hex);
+        playerInfo.SetHexToColor32(hex);
+
+
+        //faceindex = InfoManager.Ins.clothesNum; //얼굴 초기화
+        faceindex = playerInfo.clothesNum;
         UpdateFace(faceindex); //얼굴 업데이트 함수    //JSON 데이터 연결
 
 
         //플레이어 백팩 커스터마이징 추가
         Backindex = 0; //백팩 초기화
-        switch(ColorToHex(InfoManager.Ins.clothesColor))        //JSON 데이터 연결
+        //switch(ColorToHex(InfoManager.Ins.clothesColor))        //JSON 데이터 연결
+        switch (ColorToHex(playerInfo.clothesColor))        //JSON 데이터 연결
         {
             case ("#7ED67F") : // 초록색
                 Backindex = 0;

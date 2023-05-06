@@ -6,6 +6,99 @@ using System;
 
 namespace TeamInterface
 {
+    [System.Serializable]
+    public class PlayerInfo
+    {
+        public string playerName;
+        public string islandName;
+        public int clothesNum;
+        public Color32 clothesColor;
+
+        public PlayerInfo()
+        {
+            playerName = "";     // 그냥 null로 저장하면 안돼. null 자체로 저장이 되어버림!
+            islandName = "";
+            clothesNum = 0;
+            clothesColor = HexToColor32("#7ED67F");
+        }
+
+        public void ReSetData()
+        {
+            playerName = "";     // 그냥 null로 저장하면 안돼. null 자체로 저장이 되어버림!
+            islandName = "";
+            clothesNum = 0;
+            clothesColor = HexToColor32("#7ED67F");
+        }
+
+        public void SetData(string n, string i, int cn, string h)
+        {
+            playerName = n;     // 그냥 null로 저장하면 안돼. null 자체로 저장이 되어버림!
+            islandName = i;
+            clothesNum = cn;
+            clothesColor = HexToColor32(h);
+        }
+        public void SetData(string n, string i, int cn, Color32 h)
+        {
+            playerName = n;     // 그냥 null로 저장하면 안돼. null 자체로 저장이 되어버림!
+            islandName = i;
+            clothesNum = cn;
+            clothesColor = h;
+        }
+
+        public Color32 HexToColor32(string hex)
+        {
+            // HEX 문자열을 RGB 값으로 분리
+            byte r = byte.Parse(hex.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+            byte g = byte.Parse(hex.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+            byte b = byte.Parse(hex.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+
+            // Color32로 변환하여 반환
+            return new Color32(r, g, b, 255);
+        }
+
+        public void SetHexToColor32(string hex)
+        {
+            // HEX 문자열을 RGB 값으로 분리
+            byte r = byte.Parse(hex.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+            byte g = byte.Parse(hex.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+            byte b = byte.Parse(hex.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+
+            // Color32로 변환하여 반환
+            clothesColor= new Color32(r, g, b, 255);
+        }
+
+        public string ColorToHex(Color32 color)
+        {
+            // R, G, B 값을 HEX 문자열로 변환
+            string r = color.r.ToString("X2");
+            string g = color.g.ToString("X2");
+            string b = color.b.ToString("X2");
+
+            // '#' 문자열과 결합하여 반환
+            return "#" + r + g + b;
+        }
+
+        public string ColorToHex()
+        {
+            // R, G, B 값을 HEX 문자열로 변환
+            string r = clothesColor.r.ToString("X2");
+            string g = clothesColor.g.ToString("X2");
+            string b = clothesColor.b.ToString("X2");
+
+            // '#' 문자열과 결합하여 반환
+            return "#" + r + g + b;
+        }
+    }
+
+    [System.Serializable]
+    public class InventoryInfo  //#11-6
+    {
+        // public int itemIndex;       //n번째 슬롯
+        public int /* Enum_DropItemType */ itemType;
+        public int itemCount;           //개수
+    }
+
+
     [Serializable]
     public class MapDataClass
     {

@@ -228,15 +228,15 @@ public class csPhotonGame : UnityEngine.MonoBehaviour
     {
         childFinish = true;
 
-        Debug.Log("asdasdbbbaaa");
+        //Debug.Log("asdasdbbbaaa");
         yield return new WaitForSeconds(5f);
 
-        tPlayer.LoadInvenData();
+        //tPlayer.NewLoadInvenData();
 
-        if (tPlayer == null)
-        {
-            Debug.Log("asdasdbbbaaaccc");
-        }
+        //if (tPlayer == null)
+        //{
+        //    Debug.Log("asdasdbbbaaaccc");
+        //}
 
         craftingUI.SetActive(false);
 
